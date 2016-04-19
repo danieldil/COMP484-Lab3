@@ -14,14 +14,27 @@
     <script type="text/javascript">
 
 	var map;
+    var one = false;
+    var two = false;
+    var three = false;
+    var four = false;
 
 	function doubleClicked(e)
 	{
 		alert("Hi you double-clicked at latitude " + e.latLng.lat() + 
 					" and longitude " + e.latLng.lng() + " :-)");
+        if(one){
+            if(e.latLng.lat() >34 && e.latLng.lat <54 && e.latLng.lng() ){
+                document.getElementById("kk").innerHTML += "question 1 correct";
+            }//(34.241375, -118.528203) is jacaranda
+            
+        }
 
-	}
-
+	}  
+    function quiz(){
+        one = true;
+        document.getElementById("kk").innerHTML = "Where is jacaranda";
+          
     function init()
     {
     	var mapOptions = {
@@ -31,12 +44,20 @@
 			disableDoubleClickZoom: true,
 			disableDefaultUI: true,
 			zoomControl: false,
+            scrollwheel: false,
 			draggable: false
 	    }
+
+//      north: 34.242116,
+//      south: 34.241197,
+//      east: -118.527850,
+//      west: -118.529457
+  
 	  	map = new google.maps.Map(document.getElementById("map-canvas"), 
 	  							mapOptions);
 
 		google.maps.event.addListener(map, 'dblclick', doubleClicked);
+        
     }
     
 	window.addEventListener("load", init, false); 
@@ -44,7 +65,9 @@
   </head>
   
   <body>
-  <h1>Hi...here's a map!</h1>
+  <div id="kk">
+      hi
+      </div>
   <div id="map-canvas"></div>
   </body>
   </html>
