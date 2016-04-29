@@ -7,10 +7,21 @@
   		html { height: 100% }
 	    body { height: 100%; margin: 0; padding: 0 }
   		#map-canvas { height: 100% }
+        #animation{
+            position: absolute; 
+            top: 20px; 
+            left: 10px; 
+            z-index: 139;
+            height: 95px;
+            width: 300px;
+            background-color: indianred; 
+            display: none;
+         }
 	</style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?sensor=false">
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script type="text/javascript">
 
 	var map;
@@ -19,45 +30,188 @@
     var three = false;
     var four = false;
 
-	function doubleClicked(e)
-	{
-		alert("Hi you double-clicked at latitude " + e.latLng.lat() + 
-					" and longitude " + e.latLng.lng() + " :-)");
-        if(one){
-            if(e.latLng.lat() >34 && e.latLng.lat <54 && e.latLng.lng() ){
-                document.getElementById("kk").innerHTML += "question 1 correct";
-            }//(34.241375, -118.528203) is jacaranda
-            
-        }
-
-	}  
+    function bye(){        
+            document.getElementById("end").innerHTML = "You got " + score + " out of 5 correct answers!";
+            $(document).ready(function(){
+               $("#animation").show();
+               $("#animation").animate({top: '45%', left: '30%'});
+            });
+    }
     function quiz(){
-        one = true;
+        if(currentquestion==1){
+            document.getElementById("kk").innerHTML = "Where is universal hall";
+        }
+        if(currentquestion==2){
+        document.getElementById("kk").innerHTML = "Where is tennis courts";
+        }
+        if(currentquestion==3){
         document.getElementById("kk").innerHTML = "Where is jacaranda";
+        }
+        if(currentquestion==4){
+        document.getElementById("kk").innerHTML = "Where is sierra";
+        }
+        if(currentquestion==5){
+        document.getElementById("kk").innerHTML = "Where is chaparral";
+        }
+        if(currentquestion>5){
+            bye();
+        }
+    }
+    function wrong(){
+        places[currentquestion-1].setOptions({strokeOpacity: 1, strokeColor: '#FF0040', fillOpacity: 0.3, fillColor: '#000000'});
+        if(currentquestion>5){
+            bye();
+        }        
+    }
+    function quizo(){
+        wrong();
+        currentquestion++;
+        quiz();
+        }
           
     function init()
     {
+        currentquestion = 1;
+        score = 0;
+        var style = [{
+            featureType:"all",
+            elementType: "labels",
+            stylers : [{
+                visibility: "off"
+            }]
+            
+        }]
     	var mapOptions = {
-		    zoom: 15,
-		    center: new google.maps.LatLng(34.249705, -118.526673),
+		    zoom: 16,
+		    center: new google.maps.LatLng(34.239660, -118.529552),
 		    mapTypeId: google.maps.MapTypeId.ROADMAP,
 			disableDoubleClickZoom: true,
 			disableDefaultUI: true,
 			zoomControl: false,
             scrollwheel: false,
-			draggable: false
+			draggable: false,
+            styles: style,
+            
 	    }
-
-//      north: 34.242116,
-//      south: 34.241197,
-//      east: -118.527850,
-//      west: -118.529457
   
 	  	map = new google.maps.Map(document.getElementById("map-canvas"), 
 	  							mapOptions);
-
-		google.maps.event.addListener(map, 'dblclick', doubleClicked);
         
+        uniHall = new google.maps.Rectangle({
+               map: map,
+               strokeOpacity: 0,
+               fillOpacity: 0,
+               bounds: new google.maps.LatLngBounds(
+                  new google.maps.LatLng(34.240236, -118.532380),
+                  new google.maps.LatLng(34.239296, -118.531736)
+                  )
+            });
+        tCourts = new google.maps.Rectangle({
+               map: map,
+               strokeOpacity: 0,
+               fillOpacity: 0,
+               bounds: new google.maps.LatLngBounds(
+                  new google.maps.LatLng(34.244652, -118.524629),
+                  new google.maps.LatLng(34.243279, -118.523485)
+                  )
+            });
+        Jacaranda = new google.maps.Rectangle({
+               map: map,
+               strokeOpacity: 0,
+               fillOpacity: 0,
+               bounds: new google.maps.LatLngBounds(
+                  new google.maps.LatLng(34.242010, -118.529429),
+                  new google.maps.LatLng(34.241052, -118.527799)
+                  )
+            });
+        sierra = new google.maps.Rectangle({
+               map: map,
+               strokeOpacity: 0,
+               fillOpacity: 0,
+               bounds: new google.maps.LatLngBounds(
+                  new google.maps.LatLng(34.238471, -118.531425),
+                  new google.maps.LatLng(34.238045, -118.529955)
+                  )
+            });
+        chaparral = new google.maps.Rectangle({
+               map: map,
+               strokeOpacity: 0,
+               fillOpacity: 0,
+               bounds: new google.maps.LatLngBounds(
+                  new google.maps.LatLng(34.238675, -118.527380),
+                  new google.maps.LatLng(34.237859, -118.526543)
+                  )
+            });
+        places = [uniHall,tCourts,Jacaranda,sierra,chaparral];
+        
+  		google.maps.event.addListener(map, 'dblclick', quizo);
+        google.maps.event.addListener(uniHall,'dblclick',function(){
+            if(currentquestion == 1){
+                score++;
+                this.setOptions({strokeOpacity: 1, strokeColor: '#008200', fillOpacity: 0.3, fillColor: '#00bf00'});
+                document.getElementById("score").innerHTML = "CORRECT!";
+            }
+            else{
+                places[currentquestion-1].setOptions({strokeOpacity: 1, strokeColor: '#FF0040', fillOpacity: 0.3, fillColor: '#000000'});
+            document.getElementById("score").innerHTML = "inCORRECT!";   
+            }
+            currentquestion++;
+            quiz();
+        })
+        google.maps.event.addListener(tCourts,'dblclick',function(){
+            if(currentquestion == 2){
+                score++;
+                this.setOptions({strokeOpacity: 1, strokeColor: '#008200', fillOpacity: 0.3, fillColor: '#00bf00'});
+                document.getElementById("score").innerHTML = "CORRECT!";
+            }
+            else{
+                places[currentquestion-1].setOptions({strokeOpacity: 1, strokeColor: '#FF0040', fillOpacity: 0.3, fillColor: '#000000'});
+            document.getElementById("score").innerHTML = "inCORRECT!";   
+            }
+            currentquestion++;
+            quiz();
+        })
+        google.maps.event.addListener(Jacaranda,'dblclick',function(){
+            if(currentquestion == 3){
+                score++;
+                this.setOptions({strokeOpacity: 1, strokeColor: '#008200', fillOpacity: 0.3, fillColor: '#00bf00'});
+                document.getElementById("score").innerHTML = "CORRECT!";
+            }
+            else{
+                places[currentquestion-1].setOptions({strokeOpacity: 1, strokeColor: '#FF0040', fillOpacity: 0.3, fillColor: '#000000'});
+            document.getElementById("score").innerHTML = "inCORRECT!";   
+            }
+            currentquestion++;
+            quiz();
+        })
+        google.maps.event.addListener(sierra,'dblclick',function(){
+            if(currentquestion == 4){
+                score++;
+                this.setOptions({strokeOpacity: 1, strokeColor: '#008200', fillOpacity: 0.3, fillColor: '#00bf00'});
+                document.getElementById("kk").innerHTML = "CORRECT!";
+            }
+            else{
+                places[currentquestion-1].setOptions({strokeOpacity: 1, strokeColor: '#FF0040', fillOpacity: 0.3, fillColor: '#000000'});
+            document.getElementById("kk").innerHTML = "inCORRECT!";   
+            }
+            currentquestion++;
+            quiz();
+        })
+        google.maps.event.addListener(chaparral,'dblclick',function(){
+            if(currentquestion == 5){
+                score++;
+                this.setOptions({strokeOpacity: 1, strokeColor: '#008200', fillOpacity: 0.3, fillColor: '#00bf00'});
+                document.getElementById("kk").innerHTML = "CORRECT!";
+                bye();
+            }
+            else{
+                places[currentquestion-1].setOptions({strokeOpacity: 1, strokeColor: '#FF0040', fillOpacity: 0.3, fillColor: '#000000'});
+             document.getElementById("kk").innerHTML = "inCORRECT!";   
+            }
+            currentquestion++;
+            quiz();
+        })        
+      quiz();
     }
     
 	window.addEventListener("load", init, false); 
@@ -65,8 +219,10 @@
   </head>
   
   <body>
-  <div id="kk">
-      hi
+    <div id="kk"></div>
+      <div id="score"></div>
+      <div id="animation">
+          <h1 id="end"></h1>
       </div>
   <div id="map-canvas"></div>
   </body>
